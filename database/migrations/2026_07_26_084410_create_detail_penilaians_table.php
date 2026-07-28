@@ -20,7 +20,7 @@ return new class extends Migration
                 ->constrained('indikators')
                 ->cascadeOnDelete();
 
-            $table->tinyInteger('nilai');
+            $table->double('nilai');
 
             $table->timestamps();
         });

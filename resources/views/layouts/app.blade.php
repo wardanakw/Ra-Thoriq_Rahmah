@@ -10,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('style.css') }}">
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -388,23 +388,31 @@
          * Toggle Sidebar untuk mobile
          */
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
+            const sidebar = document.querySelector('.sidebar-custom');
             const overlay = document.getElementById('sidebarOverlay');
 
-            sidebar.classList.toggle('show');
-            overlay.classList.toggle('show');
+            if (sidebar) {
+                sidebar.classList.toggle('show');
+            }
+            if (overlay) {
+                overlay.classList.toggle('show');
+            }
         }
 
         /**
          * Tutup sidebar otomatis saat resize ke desktop
          */
         window.addEventListener('resize', function() {
-            const sidebar = document.getElementById('sidebar');
+            const sidebar = document.querySelector('.sidebar-custom');
             const overlay = document.getElementById('sidebarOverlay');
 
             if (window.innerWidth > 992) {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
+                if (sidebar) {
+                    sidebar.classList.remove('show');
+                }
+                if (overlay) {
+                    overlay.classList.remove('show');
+                }
             }
         });
 

@@ -39,11 +39,19 @@ class MuridController extends Controller
             $foto = $request->file('foto')->store('murid', 'public');
         }
 
+        $jenisKelamin = $request->jenis_kelamin;
+
+        if (in_array(strtolower($jenisKelamin), ['perempuan', 'wanita', 'female'])) {
+            $jenisKelamin = 'P';
+        } elseif (in_array(strtolower($jenisKelamin), ['laki-laki', 'laki laki', 'lakilaki', 'male', 'pria'])) {
+            $jenisKelamin = 'L';
+        }
+
         Murid::create([
             'foto' => $foto,
             'nis' => $request->nis,
             'nama' => $request->nama,
-            'jenis_kelamin' => $request->jenis_kelamin,
+            'jenis_kelamin' => $jenisKelamin,
             'tempat_lahir' => $request->tempat_lahir,
             'tanggal_lahir' => $request->tanggal_lahir,
             'kelas' => $request->kelas,
@@ -74,6 +82,16 @@ class MuridController extends Controller
         ]);
 
         $data = $request->except('foto');
+
+        if (isset($data['jenis_kelamin'])) {
+            $jenisKelamin = $data['jenis_kelamin'];
+
+            if (in_array(strtolower($jenisKelamin), ['perempuan', 'wanita', 'female'])) {
+                $data['jenis_kelamin'] = 'P';
+            } elseif (in_array(strtolower($jenisKelamin), ['laki-laki', 'laki laki', 'lakilaki', 'male', 'pria'])) {
+                $data['jenis_kelamin'] = 'L';
+            }
+        }
 
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('murid', 'public');

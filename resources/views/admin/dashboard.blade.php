@@ -490,73 +490,38 @@
     <div class="row">
         <div class="col-lg-12">
 
-            <div class="activity-card" style="border-left-color: #6C5CE7;">
-                <div class="activity-info">
-                    <div class="activity-icon bg-purple">
-                        <i class="bi bi-person-plus"></i>
+            @forelse($recentPenilaians as $item)
+                <div class="activity-card" style="border-left-color: #0984E3;">
+                    <div class="activity-info">
+                        <div class="activity-icon bg-primary">
+                            <i class="bi bi-clipboard-check"></i>
+                        </div>
+                        <div>
+                            <p class="activity-text">
+                                Penilaian terbaru: <strong>{{ $item->murid->nama ?? 'Murid' }}</strong>
+                                <small>Hasil fuzzy: {{ is_numeric($item->hasil_fuzzy) ? number_format((float) $item->hasil_fuzzy, 2) : ($item->hasil_fuzzy ?? '-') }} | Kategori: {{ $item->kategori ?? '-' }}</small>
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="activity-text">
-                            User baru terdaftar: <strong>Admin Baru</strong>
-                            <small>Role: Admin</small>
-                        </p>
-                    </div>
-                </div>
-                <div class="activity-time">
-                    <i class="bi bi-clock"></i> 5 menit lalu
-                </div>
-            </div>
-
-            <div class="activity-card" style="border-left-color: #27AE60;">
-                <div class="activity-info">
-                    <div class="activity-icon bg-success">
-                        <i class="bi bi-person-plus"></i>
-                    </div>
-                    <div>
-                        <p class="activity-text">
-                            Murid baru terdaftar: <strong>Anisa Rahma</strong>
-                            <small>Kelas B, RA Ceria</small>
-                        </p>
+                    <div class="activity-time">
+                        <i class="bi bi-clock"></i> {{ $item->created_at?->diffForHumans() ?? '-' }}
                     </div>
                 </div>
-                <div class="activity-time">
-                    <i class="bi bi-clock"></i> 2 jam lalu
-                </div>
-            </div>
-
-            <div class="activity-card" style="border-left-color: #0984E3;">
-                <div class="activity-info">
-                    <div class="activity-icon bg-primary">
-                        <i class="bi bi-clipboard-check"></i>
-                    </div>
-                    <div>
-                        <p class="activity-text">
-                            Penilaian baru: <strong>Budi Santoso</strong>
-                            <small>Kategori: BSH (Berkembang Sesuai Harapan)</small>
-                        </p>
+            @empty
+                <div class="activity-card" style="border-left-color: #6C5CE7;">
+                    <div class="activity-info">
+                        <div class="activity-icon bg-purple">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+                        <div>
+                            <p class="activity-text">
+                                Belum ada penilaian terbaru
+                                <small>Tambahkan penilaian untuk melihat aktivitas di sini.</small>
+                            </p>
+                        </div>
                     </div>
                 </div>
-                <div class="activity-time">
-                    <i class="bi bi-clock"></i> 3 jam lalu
-                </div>
-            </div>
-
-            <div class="activity-card" style="border-left-color: #F39C12;">
-                <div class="activity-info">
-                    <div class="activity-icon bg-warning">
-                        <i class="bi bi-file-earmark-text"></i>
-                    </div>
-                    <div>
-                        <p class="activity-text">
-                            Laporan bulanan <strong>Agustus 2026</strong> telah dibuat
-                            <small>Total 15 murid dinilai</small>
-                        </p>
-                    </div>
-                </div>
-                <div class="activity-time">
-                    <i class="bi bi-clock"></i> 1 hari lalu
-                </div>
-            </div>
+            @endforelse
 
         </div>
     </div>

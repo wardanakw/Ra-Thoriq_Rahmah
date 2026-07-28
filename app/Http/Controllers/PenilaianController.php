@@ -8,147 +8,309 @@ use Illuminate\Http\Request;
 use App\Models\Indikator;
 use Illuminate\Support\Facades\DB;
 use App\Models\DetailPenilaian;
-
+use App\Services\MamdaniService;
 
 class PenilaianController extends Controller
 {
+    protected $mamdaniService;
+
+    public function __construct(MamdaniService $mamdaniService)
+    {
+        $this->mamdaniService = $mamdaniService;
+    }
 
     public function index()
     {
-
-        $penilaian=Penilaian::with('murid')->latest()->paginate(10);
-
-        return view('penilaian.index',compact('penilaian'));
-
+        $penilaian = Penilaian::with('murid')->latest()->paginate(10);
+        return view('penilaian.index', compact('penilaian'));
     }
 
-public function create()
-{
-    $murid = Murid::orderBy('nama')->get();
+    public function create()
+    {
+        $murid = Murid::orderBy('nama')->get();
+        $agama = Indikator::where('kode', 'LIKE', 'A%')->orderBy('urutan')->get();
+        $jati = Indikator::where('kode', 'LIKE', 'J%')->orderBy('urutan')->get();
+        $steam = Indikator::where('kode', 'LIKE', 'L%')->orderBy('urutan')->get();
 
-    $agama = Indikator::where('kode', 'LIKE', 'A%')->orderBy('urutan')->get();
+        return view('penilaian.create', compact('murid', 'agama', 'jati', 'steam'));
+    }
 
-    $jati = Indikator::where('kode', 'LIKE', 'J%')->orderBy('urutan')->get();
+    public function show(Penilaian $penilaian)
+    {
+        $penilaian->load(['murid', 'detail.indikator']);
 
-    $literasi = Indikator::where('kode', 'LIKE', 'L%')->orderBy('urutan')->get();
+        return view('penilaian.show', compact('penilaian'));
+    }
 
-    return view(
-        'penilaian.create',
-        compact(
-            'murid',
-            'agama',
-            'jati',
-            'literasi'
-        )
-    );
-}
+    public function edit(Penilaian $penilaian)
+    {
+        $penilaian->load(['murid', 'detail.indikator']);
+        $murid = Murid::orderBy('nama')->get();
+        $agama = Indikator::where('kode', 'LIKE', 'A%')->orderBy('urutan')->get();
+        $jati = Indikator::where('kode', 'LIKE', 'J%')->orderBy('urutan')->get();
+        $steam = Indikator::where('kode', 'LIKE', 'L%')->orderBy('urutan')->get();
 
-    public function store(Request $request)
-{
+        return view('penilaian.edit', compact('penilaian', 'murid', 'agama', 'jati', 'steam'));
+    }
 
-    $request->validate([
-
-        'murid_id'=>'required',
-
-        'indikator'=>'required|array'
-
-    ]);
-
-    DB::beginTransaction();
-
-    try{
-
-        $penilaian=Penilaian::create([
-
-            'murid_id'=>$request->murid_id,
-
-            'guru_id'=>auth()->id(),
-
-            'tanggal'=>date('Y-m-d')
-
+    public function update(Request $request, Penilaian $penilaian)
+    {
+        $request->validate([
+            'murid_id' => 'required|exists:murid,id',
+            'agama' => 'required|array|min:1',
+            'jati' => 'required|array|min:1',
+            'steam' => 'required|array|min:1',
+        ], [
+            'murid_id.required' => 'Silakan pilih murid',
+            'agama.required' => 'Silakan isi semua indikator Agama',
+            'jati.required' => 'Silakan isi semua indikator Jati Diri',
+            'steam.required' => 'Silakan isi semua indikator STEAM',
         ]);
 
-        $agama=[];
+        DB::beginTransaction();
 
-        $jati=[];
+        try {
+            $penilaian->detail()->delete();
 
-        $literasi=[];
+            $agamaValues = [];
+            foreach ($request->input('agama', []) as $indikator_id => $nilai) {
+                $score = $this->mapValueToScore($nilai);
+                DetailPenilaian::create([
+                    'penilaian_id' => $penilaian->id,
+                    'indikator_id' => $indikator_id,
+                    'nilai' => $score,
+                ]);
+                $agamaValues[] = $score;
+            }
 
-        foreach($request->indikator as $indikator_id=>$nilai){
+            $jatiValues = [];
+            foreach ($request->input('jati', []) as $indikator_id => $nilai) {
+                $score = $this->mapValueToScore($nilai);
+                DetailPenilaian::create([
+                    'penilaian_id' => $penilaian->id,
+                    'indikator_id' => $indikator_id,
+                    'nilai' => $score,
+                ]);
+                $jatiValues[] = $score;
+            }
 
-            DetailPenilaian::create([
+            $steamValues = [];
+            foreach ($request->input('steam', []) as $indikator_id => $nilai) {
+                $score = $this->mapValueToScore($nilai);
+                DetailPenilaian::create([
+                    'penilaian_id' => $penilaian->id,
+                    'indikator_id' => $indikator_id,
+                    'nilai' => $score,
+                ]);
+                $steamValues[] = $score;
+            }
 
-                'penilaian_id'=>$penilaian->id,
+            $nilaiAgama = $this->normalisasi($agamaValues);
+            $nilaiJati = $this->normalisasi($jatiValues);
+            $nilaiSteam = $this->normalisasi($steamValues);
 
-                'indikator_id'=>$indikator_id,
+            $hasilMamdani = $this->mamdaniService->proses($nilaiAgama, $nilaiJati, $nilaiSteam);
+            $hasilFuzzy = round((float) $hasilMamdani['hasil'], 3);
+            $kategori = (string) $hasilMamdani['kategori'];
 
-                'nilai'=>$nilai
-
+            $penilaian->update([
+                'murid_id' => $request->murid_id,
+                'agama' => (float) $nilaiAgama,
+                'jati_diri' => (float) $nilaiJati,
+                'steam' => (float) $nilaiSteam,
+                'hasil_fuzzy' => $hasilFuzzy,
+                'kategori' => $kategori,
             ]);
 
-            $indikator=Indikator::find($indikator_id);
+            DB::commit();
 
-            if(str_starts_with($indikator->kode,'A')){
-
-                $agama[]=$nilai;
-
-            }
-
-            elseif(str_starts_with($indikator->kode,'J')){
-
-                $jati[]=$nilai;
-
-            }
-
-            else{
-
-                $literasi[]=$nilai;
-
-            }
-
+            return redirect()
+                ->route('penilaian.index')
+                ->with('success', 'Penilaian berhasil diperbarui untuk ' . $penilaian->murid->nama);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()
+                ->withInput()
+                ->with('error', 'Gagal memperbarui penilaian: ' . $e->getMessage());
         }
+    }
 
-        $nilaiAgama=$this->normalisasi($agama);
+    public function destroy(Penilaian $penilaian)
+    {
+        $penilaian->detail()->delete();
+        $penilaian->delete();
 
-        $nilaiJati=$this->normalisasi($jati);
+        return redirect()->route('penilaian.index')
+            ->with('success', 'Penilaian berhasil dihapus.');
+    }
 
-        $nilaiLiterasi=$this->normalisasi($literasi);
-
-        $penilaian->update([
-
-            'agama'=>$nilaiAgama,
-
-            'jati_diri'=>$nilaiJati,
-
-            'literasi'=>$nilaiLiterasi
-
+    public function store(Request $request)
+    {
+        // Validasi
+        $request->validate([
+            'murid_id' => 'required|exists:murid,id',
+            'agama' => 'required|array|min:1',
+            'jati' => 'required|array|min:1',
+            'steam' => 'required|array|min:1',
+        ], [
+            'murid_id.required' => 'Silakan pilih murid',
+            'agama.required' => 'Silakan isi semua indikator Agama',
+            'jati.required' => 'Silakan isi semua indikator Jati Diri',
+            'steam.required' => 'Silakan isi semua indikator STEAM',
         ]);
 
-        DB::commit();
+        DB::beginTransaction();
 
-        return redirect()
+        try {
+            // Buat penilaian utama
+            $penilaian = Penilaian::create([
+                'murid_id' => $request->murid_id,
+                'guru_id' => auth()->id(),
+                'tanggal' => date('Y-m-d'),
+                'agama' => 0,
+                'jati_diri' => 0,
+                'steam' => 0,
+                'hasil_fuzzy' => '', // String kosong
+                'kategori' => '', // String kosong
+            ]);
 
-        ->route('penilaian.index')
+            // Proses Agama
+            $agamaValues = [];
+            foreach ($request->input('agama', []) as $indikator_id => $nilai) {
+                $score = $this->mapValueToScore($nilai);
+                DetailPenilaian::create([
+                    'penilaian_id' => $penilaian->id,
+                    'indikator_id' => $indikator_id,
+                    'nilai' => $score,
+                ]);
+                $agamaValues[] = $score;
+            }
 
-        ->with('success','Penilaian berhasil disimpan');
+            // Proses Jati Diri
+            $jatiValues = [];
+            foreach ($request->input('jati', []) as $indikator_id => $nilai) {
+                $score = $this->mapValueToScore($nilai);
+                DetailPenilaian::create([
+                    'penilaian_id' => $penilaian->id,
+                    'indikator_id' => $indikator_id,
+                    'nilai' => $score,
+                ]);
+                $jatiValues[] = $score;
+            }
 
+            // Proses STEAM
+            $steamValues = [];
+            foreach ($request->input('steam', []) as $indikator_id => $nilai) {
+                $score = $this->mapValueToScore($nilai);
+                DetailPenilaian::create([
+                    'penilaian_id' => $penilaian->id,
+                    'indikator_id' => $indikator_id,
+                    'nilai' => $score,
+                ]);
+                $steamValues[] = $score;
+            }
+
+            // Hitung nilai rata-rata dan normalisasi
+            $nilaiAgama = $this->normalisasi($agamaValues);
+            $nilaiJati = $this->normalisasi($jatiValues);
+            $nilaiSteam = $this->normalisasi($steamValues);
+
+            // Hitung hasil fuzzy numerik melalui Mamdani
+            $hasilMamdani = $this->mamdaniService->proses($nilaiAgama, $nilaiJati, $nilaiSteam);
+            $hasilFuzzy = round((float) $hasilMamdani['hasil'], 3);
+            $kategori = (string) $hasilMamdani['kategori'];
+
+            // Update penilaian dengan hasil numerik
+            $penilaian->update([
+                'agama' => (float) $nilaiAgama,
+                'jati_diri' => (float) $nilaiJati,
+                'steam' => (float) $nilaiSteam,
+                'hasil_fuzzy' => $hasilFuzzy,
+                'kategori' => $kategori,
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->route('penilaian.index')
+                ->with('success', 'Penilaian berhasil disimpan untuk ' . $penilaian->murid->nama);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()
+                ->withInput()
+                ->with('error', 'Gagal menyimpan penilaian: ' . $e->getMessage());
+        }
     }
 
-    catch(\Exception $e){
+    private function normalisasi($nilai)
+    {
+        // Filter nilai yang valid
+        $nilai = array_filter($nilai, fn($item) => is_numeric($item) && $item > 0);
+        
+        if (empty($nilai)) {
+            return 0;
+        }
 
-        DB::rollback();
-
-        return back()->withErrors($e->getMessage());
-
+        $rata = array_sum($nilai) / count($nilai);
+        // Normalisasi ke skala 0-100
+        return round(($rata / 4) * 100, 2);
     }
 
-}
-private function normalisasi($nilai)
-{
+    private function mapValueToScore($value)
+    {
+        return match (strtoupper((string) $value)) {
+            'BB' => 1,
+            'MB' => 2,
+            'BSH' => 3,
+            'BSB' => 4,
+            default => (int) $value,
+        };
+    }
 
-    $rata=array_sum($nilai)/count($nilai);
+    private function convertScoreToFuzzy($score)
+    {
+        // Konversi nilai 0-100 ke fuzzy label
+        if ($score >= 75) return 'BSB';
+        if ($score >= 50) return 'BSH';
+        if ($score >= 25) return 'MB';
+        return 'BB';
+    }
 
-    return round(($rata/4)*100,2);
+    private function applyRules($rules, $agama, $jati, $steam)
+    {
+        // Cari rule yang cocok
+        foreach ($rules as $rule) {
+            if ($rule['agama'] === $agama && 
+                $rule['jati'] === $jati && 
+                $rule['steam'] === $steam) {
+                return $rule['output'];
+            }
+        }
 
-}
+        // Jika tidak ada rule yang cocok, gunakan logika sederhana
+        return $this->fallbackLogic($agama, $jati, $steam);
+    }
+
+    private function fallbackLogic($agama, $jati, $steam)
+    {
+        $values = ['BB' => 1, 'MB' => 2, 'BSH' => 3, 'BSB' => 4];
+        $avg = ($values[$agama] + $values[$jati] + $values[$steam]) / 3;
+        
+        if ($avg >= 3.5) return 'BSB';
+        if ($avg >= 2.5) return 'BSH';
+        if ($avg >= 1.5) return 'MB';
+        return 'BB';
+    }
+
+    private function getKategori($hasilFuzzy)
+    {
+        $kategori = [
+            'BB' => 'Belum Berkembang',
+            'MB' => 'Mulai Berkembang',
+            'BSH' => 'Berkembang Sesuai Harapan',
+            'BSB' => 'Berkembang Sangat Baik'
+        ];
+        return $kategori[$hasilFuzzy] ?? 'Belum Berkembang';
+    }
 }

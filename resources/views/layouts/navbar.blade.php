@@ -51,7 +51,7 @@
                         </span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
+                        <!-- <li>
                             <a class="dropdown-item" href="#">
                                 <i class="bi bi-person"></i> Profil
                             </a>
@@ -60,7 +60,7 @@
                             <a class="dropdown-item" href="#">
                                 <i class="bi bi-gear"></i> Pengaturan
                             </a>
-                        </li>
+                        </li> -->
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">

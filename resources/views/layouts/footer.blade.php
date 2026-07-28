@@ -2,7 +2,7 @@
 
 <footer class="main-footer">
     <div class="container-fluid">
-        <div class="row align-items-center">
+        <div class="row align-items-center gy-2">
             <div class="col-md-6 text-center text-md-start">
                 <strong>
                     <i class="bi bi-stars" style="color: #FF6B6B;"></i>
@@ -26,14 +26,19 @@
     .main-footer {
         background: linear-gradient(135deg, #FF6B6B, #FF8E8E, #FFB3B3);
         color: #fff;
-        padding: 20px 0;
+        padding: 16px 24px;
         margin-left: 250px;
         border-top: 4px solid #FFE66D;
         box-shadow: 0 -4px 20px rgba(255, 107, 107, 0.15);
         transition: all 0.3s ease;
         position: relative;
-        bottom: 0;
         width: calc(100% - 250px);
+        z-index: 5;
+    }
+
+    .main-footer .container-fluid {
+        max-width: 100%;
+        padding: 0;
     }
 
     .main-footer strong {
@@ -44,7 +49,7 @@
     }
 
     .main-footer .text-muted {
-        color: rgba(255, 255, 255, 0.9) !important;
+        color: rgba(255, 255, 255, 0.95) !important;
         font-weight: 600;
         font-size: 14px;
     }
@@ -58,6 +63,7 @@
         .main-footer {
             margin-left: 0;
             width: 100%;
+            padding: 14px 16px;
         }
 
         .main-footer strong {
@@ -71,11 +77,11 @@
 
     @media (max-width: 576px) {
         .main-footer {
-            padding: 15px 0;
+            padding: 12px 14px;
         }
 
         .main-footer .col-md-6 {
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .main-footer strong {

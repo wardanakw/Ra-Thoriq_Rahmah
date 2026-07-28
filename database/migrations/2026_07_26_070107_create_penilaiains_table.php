@@ -6,45 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-  public function up(): void
-{
-    Schema::create('penilaians', function (Blueprint $table) {
+    public function up(): void
+    {
+        if (!Schema::hasTable('penilaians')) {
+            Schema::create('penilaians', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('murid_id')->constrained('murid')->onDelete('cascade');
+                $table->foreignId('guru_id')->constrained('users')->onDelete('cascade');
+                $table->date('tanggal');
+                $table->decimal('agama', 5, 2)->nullable();
+                $table->decimal('jati_diri', 5, 2)->nullable();
+                $table->decimal('steam', 5, 2)->nullable();
+                $table->string('hasil_fuzzy', 50)->nullable();
+                $table->string('kategori', 100)->nullable();
+                $table->timestamps();
+            });
+        }
+    }
 
-        $table->id();
-
-        $table->foreignId('murid_id')
-            ->constrained('murid')
-            ->cascadeOnDelete();
-
-        $table->foreignId('guru_id')
-            ->constrained('users')
-            ->cascadeOnDelete();
-
-        $table->date('tanggal');
-
-        $table->double('agama')->default(0);
-
-        $table->double('jati_diri')->default(0);
-
-        $table->double('literasi')->default(0);
-
-        $table->double('hasil_fuzzy')->nullable();
-
-        $table->string('kategori')->nullable();
-
-        $table->timestamps();
-
-    });
-}
-
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('penilaiains');
+        Schema::dropIfExists('penilaians');
     }
 };

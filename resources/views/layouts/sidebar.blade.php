@@ -67,7 +67,7 @@
                     <span>Penilaian</span>
                 </a>
 
-                <a href="{{ route('laporan') }}"
+                <a href="{{ route('laporan.index') }}"
                    class="nav-link {{ request()->routeIs('laporan') ? 'active' : '' }}">
                     <i class="bi bi-file-earmark-text-fill"></i>
                     <span>Laporan</span>

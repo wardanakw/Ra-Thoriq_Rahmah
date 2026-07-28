@@ -554,7 +554,7 @@
                             <th width="130">Tanggal</th>
                             <th width="120">Agama</th>
                             <th width="120">Jati Diri</th>
-                            <th width="120">Literasi</th>
+                            <th width="120">STEAM</th>
                             <th width="120">Fuzzy</th>
                             <th width="160">Kategori</th>
                             <th width="220">Aksi</th>
@@ -581,36 +581,87 @@
                             </td>
                             <td>
                                 <span class="nilai-angka nilai-agama">
-                                    {{ number_format($item->agama,2) }}
+                                    {{ is_numeric($item->agama) ? number_format((float) $item->agama, 2) : '-' }}
                                 </span>
                             </td>
                             <td>
                                 <span class="nilai-angka nilai-jati">
-                                    {{ number_format($item->jati_diri,2) }}
+                                    {{ is_numeric($item->jati_diri) ? number_format((float) $item->jati_diri, 2) : '-' }}
                                 </span>
                             </td>
                             <td>
+                                @php $steamValue = $item->steam ?? $item->literasi ?? null; @endphp
                                 <span class="nilai-angka nilai-literasi">
-                                    {{ number_format($item->literasi,2) }}
+                                    {{ is_numeric($steamValue) ? number_format((float) $steamValue, 2) : '-' }}
                                 </span>
                             </td>
                             <td>
-                                @if($item->hasil_fuzzy)
-                                    <span class="nilai-angka nilai-fuzzy">
-                                        {{ number_format($item->hasil_fuzzy,2) }}
-                                    </span>
+                                @php
+                                    $fuzzyValue = $item->hasil_fuzzy;
+                                    $kategoriValue = $item->kategori;
+                                    $kategoriCode = null;
+
+                                    if (in_array($kategoriValue, ['BB', 'MB', 'BSH', 'BSB'], true)) {
+                                        $kategoriCode = $kategoriValue;
+                                    } else {
+                                        $kategoriMap = [
+                                            'Belum Berkembang' => 'BB',
+                                            'Mulai Berkembang' => 'MB',
+                                            'Berkembang Sesuai Harapan' => 'BSH',
+                                            'Berkembang Sangat Baik' => 'BSB',
+                                        ];
+                                        $kategoriCode = $kategoriMap[$kategoriValue] ?? null;
+                                    }
+
+                                    $fuzzyBadgeClass = 'badge-belum';
+                                    if ($kategoriCode == 'BB') {
+                                        $fuzzyBadgeClass = 'badge-bb';
+                                    } elseif ($kategoriCode == 'MB') {
+                                        $fuzzyBadgeClass = 'badge-mb';
+                                    } elseif ($kategoriCode == 'BSH') {
+                                        $fuzzyBadgeClass = 'badge-bsh';
+                                    } elseif ($kategoriCode == 'BSB') {
+                                        $fuzzyBadgeClass = 'badge-bsb';
+                                    }
+                                @endphp
+                                @if($fuzzyValue !== null)
+                                    <div class="d-flex flex-column align-items-center gap-1">
+                                        <span class="nilai-angka nilai-fuzzy">
+                                            {{ $fuzzyValue }}
+                                        </span>
+                                        @if($kategoriValue)
+                                            <span class="badge {{ $fuzzyBadgeClass }}">{{ $kategoriValue }}</span>
+                                        @else
+                                            <span class="badge badge-belum">-</span>
+                                        @endif
+                                    </div>
                                 @else
-                                    <span style="color: #BDC3C7;">-</span>
+                                    <div class="d-flex flex-column align-items-center gap-1">
+                                        <span style="color: #BDC3C7;">Belum</span>
+                                        <span class="badge badge-belum">Belum Diproses</span>
+                                    </div>
                                 @endif
                             </td>
                             <td>
                                 @if($item->kategori)
                                     @php
                                         $classBadge = 'badge-belum';
-                                        if($item->kategori == 'BB') $classBadge = 'badge-bb';
-                                        elseif($item->kategori == 'MB') $classBadge = 'badge-mb';
-                                        elseif($item->kategori == 'BSH') $classBadge = 'badge-bsh';
-                                        elseif($item->kategori == 'BSB') $classBadge = 'badge-bsb';
+                                        $categoryCode = null;
+                                        if (in_array($item->kategori, ['BB', 'MB', 'BSH', 'BSB'], true)) {
+                                            $categoryCode = $item->kategori;
+                                        } else {
+                                            $categoryMap = [
+                                                'Belum Berkembang' => 'BB',
+                                                'Mulai Berkembang' => 'MB',
+                                                'Berkembang Sesuai Harapan' => 'BSH',
+                                                'Berkembang Sangat Baik' => 'BSB',
+                                            ];
+                                            $categoryCode = $categoryMap[$item->kategori] ?? null;
+                                        }
+                                        if($categoryCode == 'BB') $classBadge = 'badge-bb';
+                                        elseif($categoryCode == 'MB') $classBadge = 'badge-mb';
+                                        elseif($categoryCode == 'BSH') $classBadge = 'badge-bsh';
+                                        elseif($categoryCode == 'BSB') $classBadge = 'badge-bsb';
                                     @endphp
                                     <span class="badge {{ $classBadge }}">
                                         {{ $item->kategori }}

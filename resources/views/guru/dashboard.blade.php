@@ -350,9 +350,9 @@
                     <i class="bi bi-mortarboard-fill"></i>
                 </div>
                 <h5 class="card-title">Jumlah Murid</h5>
-                <h1 class="card-number">25</h1>
+                <h1 class="card-number">{{ $totalMurid ?? 0 }}</h1>
                 <p class="card-subtitle">
-                    <i class="bi bi-arrow-up"></i> +3 dari bulan lalu
+                    <i class="bi bi-arrow-up"></i> Murid terdaftar
                 </p>
             </div>
         </div>
@@ -366,9 +366,9 @@
                     <i class="bi bi-pencil-square"></i>
                 </div>
                 <h5 class="card-title">Data Penilaian</h5>
-                <h1 class="card-number">100</h1>
+                <h1 class="card-number">{{ $totalPenilaian ?? 0 }}</h1>
                 <p class="card-subtitle">
-                    <i class="bi bi-check-circle"></i> 12 penilaian baru
+                    <i class="bi bi-check-circle"></i> Penilaian tersimpan
                 </p>
             </div>
         </div>
@@ -382,9 +382,9 @@
                     <i class="bi bi-graph-up-arrow"></i>
                 </div>
                 <h5 class="card-title">Hasil Penilaian</h5>
-                <h1 class="card-number">80</h1>
+                <h1 class="card-number">{{ $totalHasil ?? 0 }}</h1>
                 <p class="card-subtitle">
-                    <i class="bi bi-trophy"></i> 60% mencapai BSH
+                    <i class="bi bi-trophy"></i> {{ $kategoriBSH ?? 0 }} kategori BSH
                 </p>
             </div>
         </div>
@@ -406,73 +406,38 @@
 
     <div class="row">
         <div class="col-lg-12">
-            <div class="activity-card">
-                <div class="activity-info">
-                    <div class="activity-icon bg-success">
-                        <i class="bi bi-check-lg"></i>
+            @forelse($recentPenilaians as $item)
+                <div class="activity-card" style="border-left-color: #0984E3;">
+                    <div class="activity-info">
+                        <div class="activity-icon bg-primary">
+                            <i class="bi bi-clipboard-check"></i>
+                        </div>
+                        <div>
+                            <p class="activity-text">
+                                Penilaian terbaru: <strong>{{ $item->murid->nama ?? 'Murid' }}</strong>
+                                <small>Hasil fuzzy: {{ is_numeric($item->hasil_fuzzy) ? number_format((float) $item->hasil_fuzzy, 2) : ($item->hasil_fuzzy ?? '-') }} | Kategori: {{ $item->kategori ?? '-' }}</small>
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="activity-text">
-                            Penilaian baru untuk <strong>Anisa Rahma</strong>
-                            <small>Kategori: BSH (Berkembang Sesuai Harapan)</small>
-                        </p>
-                    </div>
-                </div>
-                <div class="activity-time">
-                    <i class="bi bi-clock"></i> 10 menit lalu
-                </div>
-            </div>
-
-            <div class="activity-card" style="border-left-color: #0984E3;">
-                <div class="activity-info">
-                    <div class="activity-icon bg-primary">
-                        <i class="bi bi-person-plus"></i>
-                    </div>
-                    <div>
-                        <p class="activity-text">
-                            Murid baru terdaftar: <strong>Budi Santoso</strong>
-                            <small>Kelas B, RA Ceria</small>
-                        </p>
+                    <div class="activity-time">
+                        <i class="bi bi-clock"></i> {{ $item->created_at?->diffForHumans() ?? '-' }}
                     </div>
                 </div>
-                <div class="activity-time">
-                    <i class="bi bi-clock"></i> 2 jam lalu
-                </div>
-            </div>
-
-            <div class="activity-card" style="border-left-color: #F39C12;">
-                <div class="activity-info">
-                    <div class="activity-icon bg-warning">
-                        <i class="bi bi-file-earmark-text"></i>
-                    </div>
-                    <div>
-                        <p class="activity-text">
-                            Laporan bulanan <strong>Agustus 2026</strong> telah dibuat
-                            <small>Total 15 murid dinilai</small>
-                        </p>
+            @empty
+                <div class="activity-card" style="border-left-color: #A8E6CF;">
+                    <div class="activity-info">
+                        <div class="activity-icon" style="background: #E8F5E9; color: #27AE60;">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+                        <div>
+                            <p class="activity-text">
+                                Belum ada penilaian terbaru
+                                <small>Tambahkan penilaian untuk melihat aktivitas di sini.</small>
+                            </p>
+                        </div>
                     </div>
                 </div>
-                <div class="activity-time">
-                    <i class="bi bi-clock"></i> 5 jam lalu
-                </div>
-            </div>
-
-            <div class="activity-card" style="border-left-color: #A8E6CF;">
-                <div class="activity-info">
-                    <div class="activity-icon" style="background: #E8F5E9; color: #27AE60;">
-                        <i class="bi bi-star-fill"></i>
-                    </div>
-                    <div>
-                        <p class="activity-text">
-                            <strong>Siti Aisyah</strong> mencapai kategori <strong>BSB</strong> (Berkembang Sangat Baik)
-                            <small>Pencapaian terbaik di kelas</small>
-                        </p>
-                    </div>
-                </div>
-                <div class="activity-time">
-                    <i class="bi bi-clock"></i> 1 hari lalu
-                </div>
-            </div>
+            @endforelse
         </div>
     </div>
 </div>

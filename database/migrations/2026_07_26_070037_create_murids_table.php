@@ -10,33 +10,23 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('murid', function (Blueprint $table) {
-
-        $table->id();
-
-        $table->string('foto')->nullable();
-
-        $table->string('nis')->unique();
-
-        $table->string('nama');
-
-        $table->enum('jenis_kelamin',['L','P']);
-
-        $table->string('tempat_lahir');
-
-        $table->date('tanggal_lahir');
-
-        $table->string('kelas');
-
-        $table->string('nama_orangtua');
-
-        $table->text('alamat');
-
-        $table->timestamps();
-
-    });
-}
+    {
+        if (!Schema::hasTable('murid')) {
+            Schema::create('murid', function (Blueprint $table) {
+                $table->id();
+                $table->string('foto')->nullable();
+                $table->string('nis')->unique();
+                $table->string('nama');
+                $table->enum('jenis_kelamin', ['L', 'P']);
+                $table->string('tempat_lahir');
+                $table->date('tanggal_lahir');
+                $table->string('kelas');
+                $table->string('nama_orangtua');
+                $table->text('alamat');
+                $table->timestamps();
+            });
+        }
+    }
 
         
 
@@ -45,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('murids');
+        Schema::dropIfExists('murid');
     }
 };
