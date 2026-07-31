@@ -234,6 +234,38 @@
         color: #8E44AD;
     }
 
+    .cell-badge-stack {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .membership-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .membership-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        background: #F8F9FA;
+        color: #4A4A4A;
+        border: 1px solid #E5E7EB;
+        white-space: nowrap;
+    }
+
+    .membership-chip .membership-code {
+        font-weight: 700;
+        color: #FF6B6B;
+    }
+
     /* Action Buttons */
     .btn-action {
         padding: 6px 14px;
@@ -562,6 +594,42 @@
                     </thead>
 
                     <tbody>
+                        @php
+                            $categoryLabelMap = [
+                                'BB' => '',
+                                'MB' => '',
+                                'BSH' => '',
+                                'BSB' => '',
+                                'BELUM BERKEMBANG' => 'Belum Berkembang',
+                                'MULAI BERKEMBANG' => 'Mulai Berkembang',
+                                'BERKEMBANG SESUAI HARAPAN' => 'Berkembang Sesuai Harapan',
+                                'BERKEMBANG SANGAT BAIK' => 'Berkembang Sangat Baik',
+                            ];
+                            $categoryCodeMap = [
+                                'BELUM BERKEMBANG' => 'BB',
+                                'MULAI BERKEMBANG' => 'MB',
+                                'BERKEMBANG SESUAI HARAPAN' => 'BSH',
+                                'BERKEMBANG SANGAT BAIK' => 'BSB',
+                                'BB' => 'BB',
+                                'MB' => 'MB',
+                                'BSH' => 'BSH',
+                                'BSB' => 'BSB',
+                            ];
+                            $categoryBadgeClassMap = [
+                                'BB' => 'badge-bb',
+                                'MB' => 'badge-mb',
+                                'BSH' => 'badge-bsh',
+                                'BSB' => 'badge-bsb',
+                            ];
+                            $membershipService = new \App\Services\MembershipService();
+                            $formatNumber = function ($value) {
+                                if (!is_numeric($value)) {
+                                    return $value;
+                                }
+
+                                return number_format((float) $value, 2, ',', '.');
+                            };
+                        @endphp
                         @forelse($penilaian as $item)
                         <tr>
                             <td>
@@ -580,26 +648,176 @@
                                 {{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}
                             </td>
                             <td>
-                                <span class="nilai-angka nilai-agama">
-                                    {{ is_numeric($item->agama) ? number_format((float) $item->agama, 2) : '-' }}
-                                </span>
+                                @php
+                                    $agamaValue = $item->agama;
+                                    $agamaCode = null;
+                                    $agamaLabel = null;
+                                    $agamaDisplay = '-';
+                                    $agamaMembershipEntries = [];
+
+                                    if (is_numeric($agamaValue)) {
+                                        $agamaDisplay = number_format((float) $agamaValue, 2, ',', '.');
+                                        $agamaMembership = $membershipService->fuzzifikasi((float) $agamaValue);
+                                        foreach ($agamaMembership as $membershipCode => $membershipValue) {
+                                            if ((float) $membershipValue > 0.0001) {
+                                                $agamaMembershipEntries[$membershipCode] = (float) $membershipValue;
+                                            }
+                                        }
+                                        $agamaMembershipSorted = $agamaMembershipEntries;
+                                        arsort($agamaMembershipSorted);
+                                        $agamaCode = array_key_first($agamaMembershipSorted);
+                                        $agamaLabel = $categoryLabelMap[$agamaCode] ?? '-';
+                                    } elseif (is_string($agamaValue)) {
+                                        $agamaKey = strtoupper(trim($agamaValue));
+                                        if (isset($categoryLabelMap[$agamaKey])) {
+                                            $agamaCode = $agamaKey;
+                                            $agamaLabel = $categoryLabelMap[$agamaKey];
+                                            $agamaDisplay = $agamaKey;
+                                        } elseif (isset($categoryCodeMap[$agamaKey])) {
+                                            $agamaCode = $categoryCodeMap[$agamaKey];
+                                            $agamaLabel = $categoryLabelMap[$agamaCode] ?? '-';
+                                            $agamaDisplay = $agamaCode;
+                                        } else {
+                                            $agamaDisplay = $agamaValue;
+                                        }
+                                    }
+                                @endphp
+                                @if($agamaCode)
+                                    <div class="cell-badge-stack">
+                                        <span class="nilai-angka nilai-agama">{{ $agamaDisplay }}</span>
+                                        <div class="membership-list">
+                                            @foreach($agamaMembershipEntries as $membershipCode => $membershipValue)
+                                                <span class="membership-chip">
+                                                    <span class="membership-code">{{ $membershipCode }}</span>
+                                                    <span class="membership-value">{{ number_format($membershipValue, 3, ',', '.') }}</span>
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                        <span class="badge {{ $categoryBadgeClassMap[$agamaCode] ?? 'badge-belum' }}">
+                                            <span class="d-block">{{ $agamaCode }}</span>
+                                            <small class="d-block">{{ $agamaLabel }}</small>
+                                        </span>
+                                    </div>
+                                @else
+                                    <span class="nilai-angka nilai-agama">{{ $agamaDisplay }}</span>
+                                @endif
                             </td>
                             <td>
-                                <span class="nilai-angka nilai-jati">
-                                    {{ is_numeric($item->jati_diri) ? number_format((float) $item->jati_diri, 2) : '-' }}
-                                </span>
+                                @php
+                                    $jatiValue = $item->jati_diri;
+                                    $jatiCode = null;
+                                    $jatiLabel = null;
+                                    $jatiDisplay = '-';
+                                    $jatiMembershipEntries = [];
+
+                                    if (is_numeric($jatiValue)) {
+                                        $jatiDisplay = number_format((float) $jatiValue, 2, ',', '.');
+                                        $jatiMembership = $membershipService->fuzzifikasi((float) $jatiValue);
+                                        foreach ($jatiMembership as $membershipCode => $membershipValue) {
+                                            if ((float) $membershipValue > 0.0001) {
+                                                $jatiMembershipEntries[$membershipCode] = (float) $membershipValue;
+                                            }
+                                        }
+                                        $jatiMembershipSorted = $jatiMembershipEntries;
+                                        arsort($jatiMembershipSorted);
+                                        $jatiCode = array_key_first($jatiMembershipSorted);
+                                        $jatiLabel = $categoryLabelMap[$jatiCode] ?? '-';
+                                    } elseif (is_string($jatiValue)) {
+                                        $jatiKey = strtoupper(trim($jatiValue));
+                                        if (isset($categoryLabelMap[$jatiKey])) {
+                                            $jatiCode = $jatiKey;
+                                            $jatiLabel = $categoryLabelMap[$jatiKey];
+                                            $jatiDisplay = $jatiKey;
+                                        } elseif (isset($categoryCodeMap[$jatiKey])) {
+                                            $jatiCode = $categoryCodeMap[$jatiKey];
+                                            $jatiLabel = $categoryLabelMap[$jatiCode] ?? '-';
+                                            $jatiDisplay = $jatiCode;
+                                        } else {
+                                            $jatiDisplay = $jatiValue;
+                                        }
+                                    }
+                                @endphp
+                                @if($jatiCode)
+                                    <div class="cell-badge-stack">
+                                        <span class="nilai-angka nilai-jati">{{ $jatiDisplay }}</span>
+                                        <div class="membership-list">
+                                            @foreach($jatiMembershipEntries as $membershipCode => $membershipValue)
+                                                <span class="membership-chip">
+                                                    <span class="membership-code">{{ $membershipCode }}</span>
+                                                    <span class="membership-value">{{ number_format($membershipValue, 3, ',', '.') }}</span>
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                        <span class="badge {{ $categoryBadgeClassMap[$jatiCode] ?? 'badge-belum' }}">
+                                            <span class="d-block">{{ $jatiCode }}</span>
+                                            <small class="d-block">{{ $jatiLabel }}</small>
+                                        </span>
+                                    </div>
+                                @else
+                                    <span class="nilai-angka nilai-jati">{{ $jatiDisplay }}</span>
+                                @endif
                             </td>
                             <td>
-                                @php $steamValue = $item->steam ?? $item->literasi ?? null; @endphp
-                                <span class="nilai-angka nilai-literasi">
-                                    {{ is_numeric($steamValue) ? number_format((float) $steamValue, 2) : '-' }}
-                                </span>
+                                @php
+                                    $steamValue = $item->steam ?? $item->literasi ?? null;
+                                    $steamCode = null;
+                                    $steamLabel = null;
+                                    $steamDisplay = '-';
+                                    $steamMembershipEntries = [];
+
+                                    if (is_numeric($steamValue)) {
+                                        $steamDisplay = number_format((float) $steamValue, 2, ',', '.');
+                                        $steamMembership = $membershipService->fuzzifikasi((float) $steamValue);
+                                        foreach ($steamMembership as $membershipCode => $membershipValue) {
+                                            if ((float) $membershipValue > 0.0001) {
+                                                $steamMembershipEntries[$membershipCode] = (float) $membershipValue;
+                                            }
+                                        }
+                                        $steamMembershipSorted = $steamMembershipEntries;
+                                        arsort($steamMembershipSorted);
+                                        $steamCode = array_key_first($steamMembershipSorted);
+                                        $steamLabel = $categoryLabelMap[$steamCode] ?? '-';
+                                    } elseif (is_string($steamValue)) {
+                                        $steamKey = strtoupper(trim($steamValue));
+                                        if (isset($categoryLabelMap[$steamKey])) {
+                                            $steamCode = $steamKey;
+                                            $steamLabel = $categoryLabelMap[$steamKey];
+                                            $steamDisplay = $steamKey;
+                                        } elseif (isset($categoryCodeMap[$steamKey])) {
+                                            $steamCode = $categoryCodeMap[$steamKey];
+                                            $steamLabel = $categoryLabelMap[$steamCode] ?? '-';
+                                            $steamDisplay = $steamCode;
+                                        } else {
+                                            $steamDisplay = $steamValue;
+                                        }
+                                    }
+                                @endphp
+                                @if($steamCode)
+                                    <div class="cell-badge-stack">
+                                        <span class="nilai-angka nilai-literasi">{{ $steamDisplay }}</span>
+                                        <div class="membership-list">
+                                            @foreach($steamMembershipEntries as $membershipCode => $membershipValue)
+                                                <span class="membership-chip">
+                                                    <span class="membership-code">{{ $membershipCode }}</span>
+                                                    <span class="membership-value">{{ number_format($membershipValue, 3, ',', '.') }}</span>
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                        <span class="badge {{ $categoryBadgeClassMap[$steamCode] ?? 'badge-belum' }}">
+                                            <span class="d-block">{{ $steamCode }}</span>
+                                            <small class="d-block">{{ $steamLabel }}</small>
+                                        </span>
+                                    </div>
+                                @else
+                                    <span class="nilai-angka nilai-literasi">{{ $steamDisplay }}</span>
+                                @endif
                             </td>
                             <td>
                                 @php
                                     $fuzzyValue = $item->hasil_fuzzy;
                                     $kategoriValue = $item->kategori;
                                     $kategoriCode = null;
+                                    $kategoriLabel = null;
 
                                     if (in_array($kategoriValue, ['BB', 'MB', 'BSH', 'BSB'], true)) {
                                         $kategoriCode = $kategoriValue;
@@ -613,6 +831,8 @@
                                         $kategoriCode = $kategoriMap[$kategoriValue] ?? null;
                                     }
 
+                                    $kategoriLabel = $categoryLabelMap[$kategoriCode] ?? '-';
+
                                     $fuzzyBadgeClass = 'badge-belum';
                                     if ($kategoriCode == 'BB') {
                                         $fuzzyBadgeClass = 'badge-bb';
@@ -625,18 +845,19 @@
                                     }
                                 @endphp
                                 @if($fuzzyValue !== null)
-                                    <div class="d-flex flex-column align-items-center gap-1">
-                                        <span class="nilai-angka nilai-fuzzy">
-                                            {{ $fuzzyValue }}
-                                        </span>
-                                        @if($kategoriValue)
-                                            <span class="badge {{ $fuzzyBadgeClass }}">{{ $kategoriValue }}</span>
+                                    <div class="cell-badge-stack">
+                                        <span class="nilai-angka nilai-fuzzy">{{ number_format((float) $fuzzyValue, 2, ',', '.') }}</span>
+                                        @if($kategoriCode)
+                                            <span class="badge {{ $fuzzyBadgeClass }}">
+                                                <span class="d-block">{{ $kategoriCode }}</span>
+                                                <small class="d-block">{{ $kategoriLabel }}</small>
+                                            </span>
                                         @else
                                             <span class="badge badge-belum">-</span>
                                         @endif
                                     </div>
                                 @else
-                                    <div class="d-flex flex-column align-items-center gap-1">
+                                    <div class="cell-badge-stack">
                                         <span style="color: #BDC3C7;">Belum</span>
                                         <span class="badge badge-belum">Belum Diproses</span>
                                     </div>
@@ -663,14 +884,19 @@
                                         elseif($categoryCode == 'BSH') $classBadge = 'badge-bsh';
                                         elseif($categoryCode == 'BSB') $classBadge = 'badge-bsb';
                                     @endphp
-                                    <span class="badge {{ $classBadge }}">
-                                        {{ $item->kategori }}
-                                    </span>
+                                    <div class="cell-badge-stack">
+                                        <span class="badge {{ $classBadge }}">
+                                            <span class="d-block">{{ $categoryCode }}</span>
+                                            <small class="d-block">{{ $categoryLabelMap[$categoryCode] ?? '-' }}</small>
+                                        </span>
+                                    </div>
                                 @else
-                                    <span class="badge badge-belum">
-                                        <i class="bi bi-clock-history"></i>
-                                        Belum Diproses
-                                    </span>
+                                    <div class="cell-badge-stack">
+                                        <span class="badge badge-belum">
+                                            <i class="bi bi-clock-history"></i>
+                                            Belum Diproses
+                                        </span>
+                                    </div>
                                 @endif
                             </td>
                             <td>
