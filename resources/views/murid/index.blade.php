@@ -514,7 +514,7 @@
                 <tbody>
                     @forelse($murid as $item)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ ($murid->firstItem() ?? 0) + $loop->index }}</td>
                         <td>
                             @if($item->foto)
                                 <img src="{{ asset('storage/'.$item->foto) }}"

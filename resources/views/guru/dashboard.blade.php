@@ -346,6 +346,7 @@
     <div class="col-md-4 col-sm-6">
         <div class="dashboard-card card-murid">
             <div class="card-body text-center">
+                <a href="{{ route('murid.index') }}" class="stretched-link" aria-label="Jumlah Murid"></a>
                 <div class="icon-wrapper">
                     <i class="bi bi-mortarboard-fill"></i>
                 </div>
@@ -362,6 +363,7 @@
     <div class="col-md-4 col-sm-6">
         <div class="dashboard-card card-penilaian">
             <div class="card-body text-center">
+                <a href="{{ route('penilaian.index') }}" class="stretched-link" aria-label="Data Penilaian"></a>
                 <div class="icon-wrapper">
                     <i class="bi bi-pencil-square"></i>
                 </div>
@@ -378,6 +380,7 @@
     <div class="col-md-4 col-sm-6">
         <div class="dashboard-card card-hasil">
             <div class="card-body text-center">
+                <a href="{{ route('penilaian.index') }}?filter=hasil" class="stretched-link" aria-label="Hasil Penilaian"></a>
                 <div class="icon-wrapper">
                     <i class="bi bi-graph-up-arrow"></i>
                 </div>
@@ -399,7 +402,7 @@
             <i class="bi bi-clock-history"></i>
             Aktivitas Terbaru
         </h5>
-        <a href="#">
+        <a href="{{ route('penilaian.index') }}">
             Lihat Semua <i class="bi bi-arrow-right"></i>
         </a>
     </div>

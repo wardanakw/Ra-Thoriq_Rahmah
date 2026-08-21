@@ -3,6 +3,48 @@
 @section('content')
 
 <style>
+        .page-header {
+        background: white;
+        padding: 20px 25px;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        border-left: 5px solid #FF6B6B;
+    }
+
+    .page-header h4 {
+        color: #2C3E50;
+        font-weight: 800;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-header h4 i {
+        color: #FF6B6B;
+        font-size: 28px;
+    }
+
+    .page-header .breadcrumb-custom {
+        font-size: 14px;
+        color: #7F8C8D;
+    }
+
+    .page-header .breadcrumb-custom a {
+        color: #FF6B6B;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .page-header .breadcrumb-custom a:hover {
+        text-decoration: underline;
+    }
     .card {
         border: none;
         border-radius: 20px;
@@ -180,7 +222,20 @@
     .legend-color.bsh { background: #D4EDDA; }
     .legend-color.bsb { background: #C3E6CB; }
 </style>
-
+<div class="page-header">
+    <h4>
+        <i class="fas fa-star"></i>
+        Penilaian Perkembangan Anak
+    </h4>
+    <div class="breadcrumb-custom">
+        <i class="bi bi-house"></i>
+        <a href="{{ auth()->user()?->role === 'admin' ? route('admin.dashboard') : route('guru.dashboard') }}">Dashboard</a>
+        <i class="bi bi-chevron-right" style="font-size: 12px;"></i>
+        <a href="{{ route('penilaian.index') }}">Data Penilaian</a>
+        <i class="bi bi-chevron-right" style="font-size: 12px;"></i>
+        <span style="color: #27AE60; font-weight: 600;">Edit</span>
+    </div>
+</div>
 <div class="container py-4">
     <div class="card">
         <div class="card-header">

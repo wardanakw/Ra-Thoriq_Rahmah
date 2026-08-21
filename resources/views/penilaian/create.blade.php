@@ -537,12 +537,12 @@
         Penilaian Perkembangan Anak
     </h4>
     <div class="breadcrumb-custom">
-        <i class="fas fa-home"></i>
+        <i class="bi bi-house"></i>
         <a href="{{ auth()->user()?->role === 'admin' ? route('admin.dashboard') : route('guru.dashboard') }}">Dashboard</a>
-        <i class="fas fa-chevron-right" style="font-size: 12px;"></i>
+        <i class="bi bi-chevron-right" style="font-size: 12px;"></i>
         <a href="{{ route('penilaian.index') }}">Data Penilaian</a>
-        <i class="fas fa-chevron-right" style="font-size: 12px;"></i>
-        <span style="color: #FF6B6B; font-weight: 600;">Tambah</span>
+        <i class="bi bi-chevron-right" style="font-size: 12px;"></i>
+        <span style="color: #27AE60; font-weight: 600;">Tambah</span>
     </div>
 </div>
 

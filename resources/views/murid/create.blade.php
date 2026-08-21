@@ -51,6 +51,77 @@
         text-decoration: underline;
     }
 
+    /* ===== NOTIFICATION ALERT ===== */
+    .alert-custom {
+        border-radius: 15px;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+        border: none;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideDown 0.5s ease;
+    }
+
+    .alert-custom i {
+        font-size: 24px;
+    }
+
+    .alert-custom .alert-content {
+        flex: 1;
+    }
+
+    .alert-custom .alert-content h5 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    .alert-custom .alert-content p {
+        margin: 0;
+        font-size: 13px;
+        opacity: 0.9;
+    }
+
+    .alert-success-custom {
+        background: linear-gradient(135deg, #A8E6CF, #88D8B0);
+        color: #1B5E20;
+    }
+
+    .alert-success-custom i {
+        color: #2E7D32;
+    }
+
+    .alert-danger-custom {
+        background: linear-gradient(135deg, #FFCDD2, #EF9A9A);
+        color: #B71C1C;
+    }
+
+    .alert-danger-custom i {
+        color: #C62828;
+    }
+
+    .alert-warning-custom {
+        background: linear-gradient(135deg, #FFE0B2, #FFCC80);
+        color: #E65100;
+    }
+
+    .alert-warning-custom i {
+        color: #EF6C00;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     /* ===== CARD ===== */
     .card-form {
         border: none;
@@ -226,6 +297,13 @@
         border-radius: 12px;
         text-align: center;
         display: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .foto-preview:hover {
+        border-color: #88D8B0;
+        background: #F0FFF4;
     }
 
     .foto-preview img {
@@ -354,12 +432,12 @@
     }
 </style>
 
-
 @php
     $dashboardRoute = auth()->check()
         ? (auth()->user()->role === 'admin' ? route('admin.dashboard') : route('guru.dashboard'))
         : route('login');
 @endphp
+
 <div class="page-header">
     <h4>
         <i class="bi bi-person-plus-fill"></i>
@@ -374,6 +452,61 @@
         <span style="color: #27AE60; font-weight: 600;">Tambah</span>
     </div>
 </div>
+
+<!-- ===== NOTIFICATIONS ===== -->
+@if(session('success'))
+    <div class="alert alert-success-custom alert-custom" role="alert">
+        <i class="bi bi-check-circle-fill"></i>
+        <div class="alert-content">
+            <h5>Berhasil!</h5>
+            <p>{{ session('success') }}</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" 
+                style="font-size: 12px; opacity: 0.7;"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger-custom alert-custom" role="alert">
+        <i class="bi bi-x-circle-fill"></i>
+        <div class="alert-content">
+            <h5>Gagal!</h5>
+            <p>{{ session('error') }}</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                style="font-size: 12px; opacity: 0.7;"></button>
+    </div>
+@endif
+
+@if(session('warning'))
+    <div class="alert alert-warning-custom alert-custom" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div class="alert-content">
+            <h5>Perhatian!</h5>
+            <p>{{ session('warning') }}</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                style="font-size: 12px; opacity: 0.7;"></button>
+    </div>
+@endif
+
+<!-- ===== VALIDATION ERRORS ===== -->
+@if($errors->any())
+    <div class="alert alert-danger-custom alert-custom" role="alert">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <div class="alert-content">
+            <h5>Validasi Gagal!</h5>
+            <p>Mohon periksa kembali data yang Anda masukkan.</p>
+            <ul style="margin: 5px 0 0 20px; font-size: 13px;">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                style="font-size: 12px; opacity: 0.7;"></button>
+    </div>
+@endif
 
 <!-- ===== FORM CARD ===== -->
 <div class="card card-form shadow">
@@ -403,9 +536,12 @@
                         <div class="file-input-wrapper">
                             <input type="file"
                                    name="foto"
-                                   class="form-control"
+                                   class="form-control @error('foto') is-invalid @enderror"
                                    id="inputFoto"
                                    accept="image/*">
+                            @error('foto')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="foto-preview" id="previewFoto">
                             <img src="#" alt="Preview Foto" id="previewImg">
@@ -431,9 +567,13 @@
                         </label>
                         <input type="text"
                                name="nis"
-                               class="form-control"
+                               class="form-control @error('nis') is-invalid @enderror"
+                               value="{{ old('nis') }}"
                                placeholder="Masukkan NIS murid"
                                required>
+                        @error('nis')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
@@ -447,9 +587,13 @@
                         </label>
                         <input type="text"
                                name="nama"
-                               class="form-control"
+                               class="form-control @error('nama') is-invalid @enderror"
+                               value="{{ old('nama') }}"
                                placeholder="Masukkan nama lengkap murid"
                                required>
+                        @error('nama')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
@@ -462,12 +606,15 @@
                             <span class="required">*</span>
                         </label>
                         <select name="jenis_kelamin"
-                                class="form-select"
+                                class="form-select @error('jenis_kelamin') is-invalid @enderror"
                                 required>
                             <option value="">-- Pilih Jenis Kelamin --</option>
-                            <option value="Laki-laki"> Laki-Laki</option>
-                            <option value="Perempuan"> Perempuan</option>
+                            <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-Laki</option>
+                            <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
                         </select>
+                        @error('jenis_kelamin')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
@@ -488,9 +635,13 @@
                         </label>
                         <input type="text"
                                name="tempat_lahir"
-                               class="form-control"
+                               class="form-control @error('tempat_lahir') is-invalid @enderror"
+                               value="{{ old('tempat_lahir') }}"
                                placeholder="Contoh: Jakarta"
                                required>
+                        @error('tempat_lahir')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
@@ -504,8 +655,12 @@
                         </label>
                         <input type="date"
                                name="tanggal_lahir"
-                               class="form-control"
+                               class="form-control @error('tanggal_lahir') is-invalid @enderror"
+                               value="{{ old('tanggal_lahir') }}"
                                required>
+                        @error('tanggal_lahir')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
@@ -525,12 +680,15 @@
                             <span class="required">*</span>
                         </label>
                         <select name="kelas"
-                                class="form-select"
+                                class="form-select @error('kelas') is-invalid @enderror"
                                 required>
                             <option value="">-- Pilih Kelas --</option>
-                            <option value="A">Kelas A</option>
-                            <option value="B">Kelas B</option>
+                            <option value="A" {{ old('kelas') == 'A' ? 'selected' : '' }}>Kelas A</option>
+                            <option value="B" {{ old('kelas') == 'B' ? 'selected' : '' }}>Kelas B</option>
                         </select>
+                        @error('kelas')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
@@ -544,9 +702,13 @@
                         </label>
                         <input type="text"
                                name="nama_orangtua"
-                               class="form-control"
+                               class="form-control @error('nama_orangtua') is-invalid @enderror"
+                               value="{{ old('nama_orangtua') }}"
                                placeholder="Masukkan nama orang tua/wali"
                                required>
+                        @error('nama_orangtua')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
@@ -560,9 +722,12 @@
                         </label>
                         <textarea name="alamat"
                                   rows="3"
-                                  class="form-control"
+                                  class="form-control @error('alamat') is-invalid @enderror"
                                   placeholder="Masukkan alamat lengkap murid"
-                                  required></textarea>
+                                  required>{{ old('alamat') }}</textarea>
+                        @error('alamat')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
@@ -612,6 +777,17 @@
         previewFoto.addEventListener('click', function() {
             inputFoto.click();
         });
+
+        // Auto close alert after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert-custom');
+            alerts.forEach(function(alert) {
+                const closeBtn = alert.querySelector('.btn-close');
+                if (closeBtn) {
+                    closeBtn.click();
+                }
+            });
+        }, 5000);
     });
 </script>
 

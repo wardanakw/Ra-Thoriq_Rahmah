@@ -634,7 +634,7 @@
                         <tr>
                             <td>
                                 <span style="display: inline-block; width: 30px; height: 30px; background: #FFF0F0; border-radius: 50%; line-height: 30px; color: #FF6B6B; font-weight: 700;">
-                                    {{ $loop->iteration }}
+                                    {{ ($penilaian->firstItem() ?? 0) + $loop->index }}
                                 </span>
                             </td>
                             <td class="text-start">

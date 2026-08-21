@@ -582,6 +582,520 @@
             padding: 6px 10px;
         }
     }
+    /* ================================================================ */
+/* ===== STYLE KHUSUS UNTUK CETAK (PRINT) ===== */
+/* ================================================================ */
+@media print {
+    /* Sembunyikan elemen yang tidak perlu saat cetak */
+    .no-print,
+    .page-header,
+    .breadcrumb-custom,
+    .btn-group-action,
+    .btn-action,
+    .btn-kembali,
+    .btn-edit,
+    .btn-print {
+        display: none !important;
+    }
+
+    /* Atur margin halaman A4 */
+    @page {
+        margin: 1.5cm 1.5cm 1.5cm 1.5cm;
+        size: A4 portrait;
+    }
+
+    /* Body cetak */
+    body {
+        background: white !important;
+        font-size: 12px;
+        color: #000 !important;
+        font-family: 'Times New Roman', 'Arial', sans-serif;
+    }
+
+    /* Container */
+    .container, .container-fluid {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Card */
+    .card-detail {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        border-radius: 8px !important;
+        margin: 0 !important;
+    }
+
+    .card-detail .card-header {
+        background: #3498DB !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        border-bottom: 3px solid #FFE66D !important;
+        border-radius: 8px 8px 0 0 !important;
+        padding: 12px 20px !important;
+    }
+
+    .card-detail .card-header h3 {
+        color: #fff !important;
+        font-size: 16px !important;
+        text-shadow: none !important;
+    }
+
+    .card-detail .card-header h3 i {
+        color: #FFE66D !important;
+    }
+
+    .card-detail .card-body {
+        padding: 20px !important;
+    }
+
+    /* ===== HEADER LAPORAN (untuk cetak) ===== */
+    .print-header {
+        display: block !important;
+        text-align: center;
+        border-bottom: 3px double #1a5276;
+        padding-bottom: 12px;
+        margin-bottom: 18px;
+    }
+
+    .print-header .instansi {
+        font-size: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        letter-spacing: 2px;
+    }
+
+    .print-header .nama-sekolah {
+        font-size: 20px;
+        font-weight: 800;
+        color: #1a5276;
+        margin: 3px 0;
+        letter-spacing: 3px;
+    }
+
+    .print-header .alamat-sekolah {
+        font-size: 10px;
+        color: #555;
+        margin: 2px 0;
+    }
+
+    .print-header .judul-laporan {
+        font-size: 16px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 10px 0 5px 0;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .print-header .periode {
+        font-size: 12px;
+        color: #555;
+        font-weight: 600;
+    }
+
+    .print-header .kode-dokumen {
+        font-size: 9px;
+        color: #999;
+        float: right;
+        margin-top: -25px;
+    }
+
+    /* ===== STUDENT PROFILE ===== */
+    .student-profile {
+        background: #f8f9fa !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        border: 1px solid #ddd !important;
+        padding: 10px 15px !important;
+        border-radius: 6px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .student-profile .avatar {
+        background: #3498DB !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 22px !important;
+    }
+
+    .student-profile .info h4 {
+        font-size: 15px !important;
+        color: #2c3e50 !important;
+    }
+
+    .student-profile .info .sub-info {
+        font-size: 12px !important;
+        color: #555 !important;
+    }
+
+    .student-profile .info .sub-info i {
+        color: #3498DB !important;
+    }
+
+    /* ===== RESULT GRID ===== */
+    .result-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 8px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .result-item {
+        background: #f8f9fa !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        border: 1px solid #e0e0e0 !important;
+        border-left: 4px solid #3498DB !important;
+        padding: 8px 12px !important;
+        border-radius: 6px !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    .result-item:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .result-item .label {
+        font-size: 10px !important;
+        color: #7f8c8d !important;
+    }
+
+    .result-item .value {
+        font-size: 20px !important;
+        color: #2c3e50 !important;
+    }
+
+    .result-item.highlight {
+        background: #e8f5e9 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        border-left-color: #27ae60 !important;
+    }
+
+    .result-item.highlight .value {
+        color: #27ae60 !important;
+    }
+
+    /* ===== KATEGORI BADGE ===== */
+    .badge-kategori {
+        font-size: 14px !important;
+        padding: 5px 20px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        border-radius: 50px !important;
+    }
+
+    .badge-kategori.bb {
+        background: #FFE5E5 !important;
+        color: #D63031 !important;
+        border: 2px solid #FF7675 !important;
+    }
+
+    .badge-kategori.mb {
+        background: #FFF3CD !important;
+        color: #F39C12 !important;
+        border: 2px solid #FDCB6E !important;
+    }
+
+    .badge-kategori.bsh {
+        background: #D4EDDA !important;
+        color: #27AE60 !important;
+        border: 2px solid #6DD5A0 !important;
+    }
+
+    .badge-kategori.bsb {
+        background: #C3E6CB !important;
+        color: #1E8449 !important;
+        border: 2px solid #58D68D !important;
+    }
+
+    .badge-kategori.belum {
+        background: #EAECEE !important;
+        color: #7F8C8D !important;
+        border: 2px solid #BDC3C7 !important;
+    }
+
+    /* ===== KATEGORI DESKRIPSI ===== */
+    .kategori-description {
+        background: #f8f9fa !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        border-left: 5px solid #3498DB !important;
+        padding: 12px 18px !important;
+        margin: 12px 0 18px 0 !important;
+        border-radius: 6px !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    .kategori-description:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .kategori-description .kategori-title {
+        font-size: 14px !important;
+    }
+
+    .kategori-description .kategori-text {
+        font-size: 12px !important;
+        line-height: 1.6 !important;
+        background: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        padding: 6px 10px !important;
+        border-radius: 4px !important;
+    }
+
+    /* ===== DETAIL TABLE ===== */
+    .detail-table {
+        margin-top: 15px !important;
+    }
+
+    .detail-table h5 {
+        font-size: 13px !important;
+        color: #27ae60 !important;
+        margin-bottom: 10px !important;
+    }
+
+    .detail-table .table {
+        border-collapse: collapse !important;
+        font-size: 11px !important;
+        width: 100% !important;
+    }
+
+    .detail-table .table thead th {
+        background: #EDE7F6 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        border: 1px solid #ddd !important;
+        padding: 6px 10px !important;
+        font-size: 10px !important;
+        color: #2c3e50 !important;
+        text-transform: uppercase !important;
+        border-radius: 0 !important;
+    }
+
+    .detail-table .table tbody tr {
+        background: white !important;
+        border: none !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .detail-table .table tbody tr:hover {
+        transform: none !important;
+        box-shadow: none !important;
+        background: white !important;
+    }
+
+    .detail-table .table tbody td {
+        padding: 5px 10px !important;
+        border: 1px solid #eee !important;
+        font-size: 11px !important;
+        color: #333 !important;
+        border-radius: 0 !important;
+    }
+
+    .detail-table .table tbody td:first-child {
+        border-radius: 0 !important;
+        color: #3498DB !important;
+        font-weight: 700 !important;
+    }
+
+    .detail-table .table tbody td:last-child {
+        border-radius: 0 !important;
+    }
+
+    /* ===== NILAI BADGE ===== */
+    .badge-nilai {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        font-size: 10px !important;
+        padding: 2px 12px !important;
+        border-radius: 50px !important;
+    }
+
+    .badge-nilai.bb {
+        background: #FFE5E5 !important;
+        color: #D63031 !important;
+    }
+
+    .badge-nilai.mb {
+        background: #FFF3CD !important;
+        color: #F39C12 !important;
+    }
+
+    .badge-nilai.bsh {
+        background: #D4EDDA !important;
+        color: #27AE60 !important;
+    }
+
+    .badge-nilai.bsb {
+        background: #C3E6CB !important;
+        color: #1E8449 !important;
+    }
+
+    /* ===== TOTAL INFORMASI ===== */
+    .detail-table .text-muted {
+        font-size: 11px !important;
+        color: #666 !important;
+    }
+
+    /* ===== FOOTER LAPORAN ===== */
+    .print-footer {
+        display: flex !important;
+        margin-top: 25px !important;
+        padding-top: 15px !important;
+        border-top: 2px solid #dee2e6 !important;
+        justify-content: space-between !important;
+        align-items: flex-end !important;
+        flex-wrap: wrap !important;
+    }
+
+    .print-footer .catatan {
+        font-size: 10px !important;
+        color: #6c757d !important;
+        line-height: 1.6 !important;
+    }
+
+    .print-footer .catatan ul {
+        margin: 3px 0 0 0 !important;
+        padding-left: 18px !important;
+    }
+
+    .print-footer .catatan ul li {
+        margin-bottom: 1px !important;
+    }
+
+    .print-footer .ttd {
+        text-align: center !important;
+        min-width: 180px !important;
+    }
+
+    .print-footer .ttd .garis {
+        border-top: 1px solid #333 !important;
+        width: 180px !important;
+        margin: 20px auto 5px auto !important;
+    }
+
+    .print-footer .ttd .jabatan {
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        color: #333 !important;
+    }
+
+    .print-footer .ttd .nama {
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        color: #1a5276 !important;
+    }
+
+    .print-footer .ttd .nip {
+        font-size: 10px !important;
+        color: #6c757d !important;
+    }
+
+    /* ===== WATERMARK ===== */
+    .print-watermark {
+        position: fixed !important;
+        bottom: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, 50%) rotate(-45deg) !important;
+        font-size: 70px !important;
+        color: rgba(0,0,0,0.03) !important;
+        font-weight: 900 !important;
+        letter-spacing: 10px !important;
+        pointer-events: none !important;
+        z-index: 999 !important;
+        font-family: 'Arial', sans-serif !important;
+        text-transform: uppercase !important;
+    }
+
+    /* ===== TEXT COLOR ===== */
+    .text-muted {
+        color: #666 !important;
+    }
+
+    .text-center {
+        text-align: center !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 10px !important;
+    }
+
+    /* ===== PAGE BREAK ===== */
+    .page-break {
+        page-break-before: always !important;
+    }
+
+    .page-break-after {
+        page-break-after: always !important;
+    }
+
+    /* ===== HAPUS HOVER EFFECT ===== */
+    .result-item:hover,
+    .kategori-description:hover,
+    .detail-table .table tbody tr:hover {
+        transform: none !important;
+        box-shadow: none !important;
+        background: inherit !important;
+    }
+
+    /* ===== CARD BODY PADDING ===== */
+    .card-detail .card-body {
+        padding: 15px 20px !important;
+    }
+
+    /* ===== TABLE RESPONSIVE ===== */
+    .table-responsive {
+        overflow: visible !important;
+        width: 100% !important;
+    }
+
+    /* ===== BADGE STYLE ===== */
+    .badge {
+        background: #EDE7F6 !important;
+        color: #6C5CE7 !important;
+        font-weight: 700 !important;
+        padding: 2px 10px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* ===== FONT AWESOME ICON ===== */
+    .bi {
+        font-size: 12px !important;
+    }
+
+    .student-profile .bi,
+    .result-item .bi,
+    .kategori-description .bi {
+        font-size: 12px !important;
+    }
+
+    /* ===== COPYRIGHT ===== */
+    .print-copyright {
+        text-align: center !important;
+        font-size: 9px !important;
+        color: #ccc !important;
+        margin-top: 10px !important;
+        padding-top: 8px !important;
+        border-top: 1px solid #eee !important;
+    }
+
+    /* ===== KETIKA ADA GAMBAR ===== */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+}
 </style>
 
 <!-- ===== PAGE HEADER ===== -->
@@ -610,6 +1124,7 @@
     </div>
 
     <div class="card-body">
+
 
         <!-- ===== STUDENT PROFILE ===== -->
         <div class="student-profile">
@@ -801,6 +1316,33 @@
         </div>
 
     </div>
+    <!-- ===== FOOTER UNTUK CETAK ===== -->
+<div class="print-footer" style="display:none;">
+    <div class="catatan">
+        <strong>Catatan:</strong>
+        <ul>
+            <li>Laporan ini merupakan hasil penilaian perkembangan anak</li>
+            <li>BB: Belum Berkembang, MB: Mulai Berkembang, BSH: Berkembang Sesuai Harapan, BSB: Berkembang Sangat Baik</li>
+            <li>Laporan ini dicetak dari Sistem Informasi PAUD</li>
+        </ul>
+    </div>
+    <div class="ttd">
+        <div class="garis"></div>
+        <div class="jabatan">Mengetahui,</div>
+        <div class="nama">Kepala Sekolah</div>
+        <div style="font-size:11px; color:#666;">PAUD / TK Negeri Pembina</div>
+        <div style="font-size:13px; font-weight:700; margin-top:4px; color:#1a5276;">____________________</div>
+        <div class="nip">NIP. ____________________</div>
+    </div>
+</div>
+
+<!-- ===== WATERMARK UNTUK CETAK ===== -->
+<div class="print-watermark" style="display:none;">DOKUMEN RESMI</div>
+
+<!-- ===== COPYRIGHT UNTUK CETAK ===== -->
+<div class="print-copyright" style="display:none;">
+    © {{ date('Y') }} Sistem Penilaian Perkembangan Anak - PAUD / TK Negeri Pembina
+</div>
 </div>
 
 @endsection

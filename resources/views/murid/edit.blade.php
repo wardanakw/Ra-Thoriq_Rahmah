@@ -433,7 +433,7 @@
 <div class="page-header">
     <h4>
         <i class="bi bi-person-plus-fill"></i>
-        Tambah Data Murid
+        Edit Data Murid
     </h4>
     <div class="breadcrumb-custom">
         <i class="bi bi-house"></i>
@@ -441,7 +441,7 @@
         <i class="bi bi-chevron-right" style="font-size: 12px;"></i>
         <a href="{{ route('murid.index') }}">Data Murid</a>
         <i class="bi bi-chevron-right" style="font-size: 12px;"></i>
-        <span style="color: #27AE60; font-weight: 600;">Tambah</span>
+        <span style="color: #27AE60; font-weight: 600;">Edit</span>
     </div>
 </div>
 <!-- ===== EDIT FORM ===== -->

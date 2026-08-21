@@ -21,46 +21,61 @@ class MuridController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nis' => 'required|unique:murid',
-            'nama' => 'required',
-            'jenis_kelamin' => 'required',
-            'tempat_lahir' => 'required',
-            'tanggal_lahir' => 'required',
-            'kelas' => 'required',
-            'nama_orangtua' => 'required',
-            'alamat' => 'required',
-            'foto' => 'nullable|image'
-        ]);
+        try {
+            $request->validate([
+                'nis' => 'required|unique:murid,nis',
+                'nama' => 'required',
+                'jenis_kelamin' => 'required',
+                'tempat_lahir' => 'required',
+                'tanggal_lahir' => 'required',
+                'kelas' => 'required',
+                'nama_orangtua' => 'required',
+                'alamat' => 'required',
+                'foto' => 'nullable|image'
+            ]);
 
-        $foto = null;
+            $foto = null;
 
-        if ($request->hasFile('foto')) {
-            $foto = $request->file('foto')->store('murid', 'public');
+            if ($request->hasFile('foto')) {
+                $foto = $request->file('foto')->store('murid', 'public');
+            }
+
+            $jenisKelamin = $request->jenis_kelamin;
+
+            if (in_array(strtolower($jenisKelamin), ['perempuan', 'wanita', 'female'])) {
+                $jenisKelamin = 'P';
+            } elseif (in_array(strtolower($jenisKelamin), [
+                'laki-laki',
+                'laki laki',
+                'lakilaki',
+                'male',
+                'pria'
+            ])) {
+                $jenisKelamin = 'L';
+            }
+
+            Murid::create([
+                'foto' => $foto,
+                'nis' => $request->nis,
+                'nama' => $request->nama,
+                'jenis_kelamin' => $jenisKelamin,
+                'tempat_lahir' => $request->tempat_lahir,
+                'tanggal_lahir' => $request->tanggal_lahir,
+                'kelas' => $request->kelas,
+                'nama_orangtua' => $request->nama_orangtua,
+                'alamat' => $request->alamat,
+            ]);
+
+            return redirect()
+                ->route('murid.index')
+                ->with('success', 'Data murid berhasil ditambahkan!');
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
         }
-
-        $jenisKelamin = $request->jenis_kelamin;
-
-        if (in_array(strtolower($jenisKelamin), ['perempuan', 'wanita', 'female'])) {
-            $jenisKelamin = 'P';
-        } elseif (in_array(strtolower($jenisKelamin), ['laki-laki', 'laki laki', 'lakilaki', 'male', 'pria'])) {
-            $jenisKelamin = 'L';
-        }
-
-        Murid::create([
-            'foto' => $foto,
-            'nis' => $request->nis,
-            'nama' => $request->nama,
-            'jenis_kelamin' => $jenisKelamin,
-            'tempat_lahir' => $request->tempat_lahir,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'kelas' => $request->kelas,
-            'nama_orangtua' => $request->nama_orangtua,
-            'alamat' => $request->alamat,
-        ]);
-
-        return redirect()->route('murid.index')
-            ->with('success', 'Data murid berhasil ditambahkan.');
     }
 
     public function edit(Murid $murid)
@@ -86,20 +101,34 @@ class MuridController extends Controller
         if (isset($data['jenis_kelamin'])) {
             $jenisKelamin = $data['jenis_kelamin'];
 
-            if (in_array(strtolower($jenisKelamin), ['perempuan', 'wanita', 'female'])) {
+            if (in_array(strtolower($jenisKelamin), [
+                'perempuan',
+                'wanita',
+                'female'
+            ])) {
                 $data['jenis_kelamin'] = 'P';
-            } elseif (in_array(strtolower($jenisKelamin), ['laki-laki', 'laki laki', 'lakilaki', 'male', 'pria'])) {
+
+            } elseif (in_array(strtolower($jenisKelamin), [
+                'laki-laki',
+                'laki laki',
+                'lakilaki',
+                'male',
+                'pria'
+            ])) {
                 $data['jenis_kelamin'] = 'L';
             }
         }
 
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('murid', 'public');
+            $data['foto'] = $request
+                ->file('foto')
+                ->store('murid', 'public');
         }
 
         $murid->update($data);
 
-        return redirect()->route('murid.index')
+        return redirect()
+            ->route('murid.index')
             ->with('success', 'Data murid berhasil diperbarui.');
     }
 
@@ -107,11 +136,13 @@ class MuridController extends Controller
     {
         $murid->delete();
 
-        return redirect()->route('murid.index')
+        return redirect()
+            ->route('murid.index')
             ->with('success', 'Data murid berhasil dihapus.');
     }
+
     public function show(Murid $murid)
-{
-    return view('murid.show', compact('murid'));
-}
+    {
+        return view('murid.show', compact('murid'));
+    }
 }
