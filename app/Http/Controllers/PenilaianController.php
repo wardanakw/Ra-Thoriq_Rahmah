@@ -57,15 +57,28 @@ class PenilaianController extends Controller
     {
         $request->validate([
             'murid_id' => 'required|exists:murid,id',
+            'tanggal' => 'required|date',
             'agama' => 'required|array|min:1',
             'jati' => 'required|array|min:1',
             'steam' => 'required|array|min:1',
         ], [
             'murid_id.required' => 'Silakan pilih murid',
+            'tanggal.required' => 'Tanggal penilaian wajib diisi',
+            'tanggal.date' => 'Tanggal penilaian tidak valid',
             'agama.required' => 'Silakan isi semua indikator Agama',
             'jati.required' => 'Silakan isi semua indikator Jati Diri',
             'steam.required' => 'Silakan isi semua indikator STEAM',
         ]);
+
+        $penilaianSudahAda = Penilaian::where('murid_id', $request->murid_id)
+            ->whereDate('tanggal', $request->tanggal)
+            ->exists();
+
+        if ($penilaianSudahAda) {
+            return back()
+                ->withInput()
+                ->with('error', 'Penilaian untuk murid tersebut pada tanggal ini sudah ada. Silakan gunakan tanggal yang berbeda.');
+        }
 
         DB::beginTransaction();
 
@@ -166,7 +179,7 @@ class PenilaianController extends Controller
             $penilaian = Penilaian::create([
                 'murid_id' => $request->murid_id,
                 'guru_id' => auth()->id(),
-                'tanggal' => date('Y-m-d'),
+                'tanggal' => $request->tanggal,
                 'agama' => 0,
                 'jati_diri' => 0,
                 'steam' => 0,

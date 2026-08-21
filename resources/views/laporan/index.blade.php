@@ -708,7 +708,7 @@
                 <tbody>
                     @forelse($laporan as $item)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ ($laporan->firstItem() ?? 0) + $loop->index }}</td>
                         <td>
                             <i class="bi bi-person-circle" style="color: #E74C3C; margin-right: 6px;"></i>
                             {{ $item->murid->nama }}
